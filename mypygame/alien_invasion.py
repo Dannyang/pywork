@@ -3,6 +3,7 @@ import pygame
 from settings import Setting
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class AlienInvasion:
@@ -16,6 +17,9 @@ class AlienInvasion:
         self.ship = Ship(self)
         # pygame.sprite.Group用于管理所有已经发射的子弹
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        # 先初始化敌人
+        self.create_fleet_aliens()
 
     def listen_to_keyboard(self):
         # 监听鼠标和键盘时间
@@ -64,15 +68,21 @@ class AlienInvasion:
         for bullet in bullets:
             if bullet.bullet_rec.top <= 0:
                 bullets.remove(bullet)
-        print(len(bullets))
+        print('num of existing bullets is' + str(len(self.bullets)))
 
     def update_screen(self):
         self.screen.fill(self.bg_color)
         self.ship.biteme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
         # 刷新屏幕
         pygame.display.flip()
+
+    def create_fleet_aliens(self):
+        alien = Alien(self)
+        self.aliens.add(alien)
+        print('num of existing bullets is' + str(len(self.aliens)))
 
     def run_game(self):
         #  Make the most recently drawn screen visible
@@ -82,8 +92,6 @@ class AlienInvasion:
             self.bullets.update()
             self.remove_unnecessary_bullet(self.bullets)
             self.update_screen()
-
-        # 监听键盘事件
 
 
 if __name__ == '__main__':
