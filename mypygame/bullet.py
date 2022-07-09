@@ -11,12 +11,13 @@ class Bullet(Sprite):
         self.setting = Setting()
         self.color = self.setting.bullet_color
         # 使用pygame新建一个碰撞体
-        self.bullet_rec = pygame.Rect((0, 0), self.setting.bullet_width, self.setting.bullet_height)
+        self.bullet_rec = pygame.Rect(0, 0, self.setting.bullet_width, self.setting.bullet_height)
         # 矫正位置从船头顶部中间发出
-        self.bullet_rec.midbottom = ai_game.ship.image_rect.mid_top
+        self.bullet_rec.midbottom = ai_game.ship.image_rect.midtop
         self.y = float(self.bullet_rec.y)
 
-    def update_position(self):
+    # 需要重写父类Sprite update方法更新rec位置
+    def update(self):
         # 向上移动式y坐标减小
         self.y -= self.setting.bullet_speed
         self.bullet_rec.y = self.y

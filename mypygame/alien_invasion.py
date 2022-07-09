@@ -59,6 +59,8 @@ class AlienInvasion:
             self.bullets.add(new_bullet)
 
     def remove_unnecessary_bullet(self, bullets):
+        # 更新管理组里所有的bullet对象的位置，并移除已经在屏幕外的bullet实例
+        self.bullets.update()
         for bullet in bullets:
             if bullet.bullet_rec.top <= 0:
                 bullets.remove(bullet)
