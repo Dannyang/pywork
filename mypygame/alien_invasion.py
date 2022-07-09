@@ -79,10 +79,22 @@ class AlienInvasion:
         # 刷新屏幕
         pygame.display.flip()
 
+    def create_alien(self, alien_number):
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        # spare_space = self.screen.get_width() - 2 * alien_width
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        self.aliens.add(alien)
+
     def create_fleet_aliens(self):
         alien = Alien(self)
-        self.aliens.add(alien)
-        print('num of existing bullets is' + str(len(self.aliens)))
+        alien_width = alien.rect.width
+        spare_space = self.screen.get_width() - 2 * alien_width
+        num_of_aliens = spare_space // (2 * alien_width)
+        for i in range(num_of_aliens):
+            self.create_alien(i)
+        print('num of existing aliens is' + str(len(self.aliens)))
 
     def run_game(self):
         #  Make the most recently drawn screen visible
