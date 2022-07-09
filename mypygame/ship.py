@@ -9,7 +9,6 @@ class Ship:
         self.setting = Setting()
         # Load the ship image and get its rect.
         self.image = pygame.image.load('images/ship.bmp')
-        self.bullet = pygame.bullet.load(self.image)
         self.image_rect = self.image.get_rect()
         # Start each new ship at the bottom center of the screen.
         self.image_rect.midbottom = self.screen_rect.midbottom
@@ -20,7 +19,6 @@ class Ship:
         self.x = float(self.image_rect.x)
         # pygame 中左上定点坐标是（0,0),往右下走横纵坐标增长
         self.y = float(self.image_rect.y)
-        self.bullet_rect.midbottom  = self.image_rect.midbottom
 
     def biteme(self):
         self.screen.blit(self.image, self.image_rect)
@@ -37,5 +35,5 @@ class Ship:
         self.image_rect.x = self.x
         self.image_rect.y = self.y
 
-    def shoot_bullet(self):
+    # def shoot_bullet(self):
 
