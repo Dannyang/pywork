@@ -14,3 +14,13 @@ class Bullet(Sprite):
         self.bullet_rec = pygame.Rect((0, 0), self.setting.bullet_width, self.setting.bullet_height)
         # 矫正位置从船头顶部中间发出
         self.bullet_rec.midbottom = ai_game.ship.image_rect.mid_top
+        self.y = float(self.bullet_rec.y)
+
+    def update_position(self):
+        # 向上移动式y坐标减小
+        self.y -= self.setting.bullet_speed
+        self.bullet_rec.y = self.y
+
+    def draw_bullet(self):
+        # 把生成的子弹生成在画布上
+        pygame.draw.rect(self.screen, self.setting.bullet_color, self.bullet_rec)
