@@ -11,8 +11,7 @@ class AlienInvasion:
     def __init__(self):
         pygame.init()
         self.setting = Setting()
-        self.screen = pygame.display.set_mode((self.setting.screen_width, self.setting.screen_height))  # 创建游戏窗口游戏窗口大小
-        pygame.display.set_caption('woah alien!!!!')  # 游戏标题
+        self.screen = self.setting.screen  # 创建游戏窗口游戏窗口大小
         self.bg_color = self.setting.bg_color
         self.ship = Ship(self)
         # pygame.sprite.Group用于管理所有已经发射的子弹
@@ -59,8 +58,11 @@ class AlienInvasion:
     def fire_bullet(self):
         # 每发射一枚子弹都需要生成一个bullet实例
         if len(self.bullets) < self.setting.bullet_amount_allowed:
-            new_bullet = Bullet(self)
+            new_bullet = Bullet()
             self.bullets.add(new_bullet)
+
+    def move_aliens(self):
+        self.aliens.update()
 
     def remove_unnecessary_bullet(self, bullets):
         # 更新管理组里所有的bullet对象的位置，并移除已经在屏幕外的bullet实例
@@ -79,21 +81,33 @@ class AlienInvasion:
         # 刷新屏幕
         pygame.display.flip()
 
-    def create_alien(self, alien_number):
-        alien = Alien(self)
+    def create_alien(self, alien_number, row_number):
+        alien = Alien()
         alien_width = alien.rect.width
         # spare_space = self.screen.get_width() - 2 * alien_width
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
         self.aliens.add(alien)
 
     def create_fleet_aliens(self):
-        alien = Alien(self)
-        alien_width = alien.rect.width
+        alien = Alien()
+        # alien_width = alien.rect.width
+        # alien_height = alien.rect.height
+        # alien.rect.size返回一个Tuple元祖
+        # 定义一个x, y = 1, 2
+        # 则x=1, y=2且元组的元素值不可再更改
+        alien_width, alien_height = alien.rect.size
+        ship_height = self.ship.image_rect.height
+        # 可用垂直空间
+        available_vertical_space = self.setting.screen_height - (3 * alien_height) - ship_height
+        rows_of_aliens = available_vertical_space // (2 * alien_height)
         spare_space = self.screen.get_width() - 2 * alien_width
         num_of_aliens = spare_space // (2 * alien_width)
-        for i in range(num_of_aliens):
-            self.create_alien(i)
+
+        for y in range(rows_of_aliens):
+            for i in range(num_of_aliens):
+                self.create_alien(i, y)
         print('num of existing aliens is' + str(len(self.aliens)))
 
     def run_game(self):
@@ -102,6 +116,7 @@ class AlienInvasion:
             self.listen_to_keyboard()
             self.ship.update_position()
             self.bullets.update()
+            self.move_aliens()
             self.remove_unnecessary_bullet(self.bullets)
             self.update_screen()
 
