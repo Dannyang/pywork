@@ -2,11 +2,13 @@ import sys
 import pygame
 
 from mypygame.alien import Alien
+from mypygame.scoreboard import Scoreboard
 from mypygame.stats import GameStats
 from settings import Setting
 from ship import Ship
 from bullet import Bullet
 from time import sleep
+from button import Button
 
 
 class AlienInvasion:
@@ -23,6 +25,8 @@ class AlienInvasion:
         # 先初始化敌人
         self.create_fleet_aliens()
         self.stats = GameStats(self)
+        self.button = Button(self, 'PLAY')
+        self.scoreboard = Scoreboard(self)
 
     def ship_hit(self):
         if self.stats.ships_left > 0:
@@ -44,6 +48,8 @@ class AlienInvasion:
                 self.check_keydown_event(event)
             elif event.type == pygame.KEYUP:
                 self.check_keyup_evnet(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.check_click_button(pygame.mouse.get_pos())
 
     def check_keydown_event(self, event):
         if event.key == pygame.K_RIGHT:
@@ -93,7 +99,10 @@ class AlienInvasion:
         self.check_aliens_and_bullets()
 
     def check_aliens_and_bullets(self):
-        pygame.sprite.groupcollide(self.bullets, self.aliens, False, True)
+        aliens_beat = pygame.sprite.groupcollide(self.bullets, self.aliens, False, True)
+        if aliens_beat:
+            self.stats.score += 1
+            self.scoreboard.prep_score()
         if not self.aliens:
             # the statements inside if block execute only if the value(boolean) is False or if the value(collection)
             # is not empty.
@@ -106,6 +115,7 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+        self.scoreboard.draw_score()
         # 刷新屏幕
         pygame.display.flip()
 
@@ -164,8 +174,17 @@ class AlienInvasion:
                 self.remove_unnecessary_bullet(self.bullets)
                 self.update_screen()
             else:
-                print("game over!!!")
-                sys.exit()
+                self.listen_to_keyboard()
+                self.button.draw_button()
+                self.aliens.empty()
+                self.bullets.empty()
+                self.stats.reset_stats()
+                self.ship.recreate_ship()
+                pygame.display.flip()
+
+    def check_click_button(self, mouse_event):
+        if self.button.rect.collidepoint(mouse_event):
+            self.stats.game_active = True
 
 
 if __name__ == '__main__':
