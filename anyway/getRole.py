@@ -68,8 +68,9 @@ def my_cdk(server, my_account):
     # 获取文本内容
     modal_text = modal_body_element.text
     if '验证码错误' in modal_text:
+        driver.quit()
         return my_cdk(server, my_account)
-    time.sleep(10)
+    time.sleep(3)
     driver.quit()
 
 
