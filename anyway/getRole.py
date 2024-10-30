@@ -1,3 +1,5 @@
+from telnetlib import EC
+
 import requests
 import json
 
@@ -7,6 +9,8 @@ from selenium import webdriver
 import time
 from selenium.webdriver.support.ui import Select
 import requests
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ExecCond  # 正确导入
 
 
 # # 模拟接口请求
@@ -57,6 +61,14 @@ def my_cdk(server, my_account):
     captcha.send_keys(the_captcha)
     SubmitBtn = driver.find_element(By.ID, 'SubmitBtn')
     SubmitBtn.click()
+    # 显式等待，直到 modal-body 元素可见
+    modal_body_element = WebDriverWait(driver, 10).until(
+        ExecCond.visibility_of_element_located((By.CLASS_NAME, 'modal-body'))
+    )
+    # 获取文本内容
+    modal_text = modal_body_element.text
+    if '验证码错误' in modal_text:
+        return my_cdk(server, my_account)
     time.sleep(10)
     driver.quit()
 
@@ -65,3 +77,4 @@ my_cdk('1', '13677912846')
 my_cdk('3', '13677912846')
 my_cdk('1', '15847134416')
 my_cdk('3', '15847134416')
+print("全部领取完成")
