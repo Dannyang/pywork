@@ -15,7 +15,10 @@ def verify(img_code):
 
 
 def my_cdk(my_password, my_username, count):
-    driver = webdriver.Chrome()
+    my_option = webdriver.ChromeOptions()
+    # 设置加载策略为html加载完成即可提高打开网页速度
+    my_option.page_load_strategy = 'eager'
+    driver = webdriver.Chrome(options=my_option)
     driver.get('https://dream.mysteelcms.com/portal_login')
     time.sleep(2)
     # 拦截请求
