@@ -22,6 +22,8 @@ def my_cdk(my_password, my_username, count):
     driver.get('https://dream.mysteelcms.com/portal_login')
     time.sleep(2)
     # 拦截请求
+    zhmmtab = driver.find_element(By.ID, 'zhmmtab')
+    zhmmtab.click()
     username = driver.find_element(By.ID, 'username')
     username.send_keys(my_username)
     password = driver.find_element(By.ID, 'password')
