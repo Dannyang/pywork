@@ -28,10 +28,10 @@ while True:
         print("程序结束。")
         break
     try:
-        data1, data2 = user_input.split(',')
-        data1 = data1.strip()  # 去除多余空格
-        data2 = data2.strip()  # 去除多余空格
-        crc(data1, data2)
+        a, b = user_input.split(',')
+        a = a.strip()  # 去除多余空格
+        b = b.strip()  # 去除多余空格
+        crc(a, b)
     except ValueError as e:
         print("输入有误请重新输入")
         continue
