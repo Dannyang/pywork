@@ -58,5 +58,5 @@ def my_cdk(my_password, my_username, count):
     driver.quit()
 
 
-my_cdk('abc123456', 'changlai', 0)
+my_cdk('fanmaomao123456', 'fanmaomao', 0)
 print("全部领取完成")

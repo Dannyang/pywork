@@ -36,8 +36,12 @@ def verify(img_code):
 
 
 def my_cdk(server, my_account):
-    driver = webdriver.Chrome()
-    driver.get('https://jsbt.asfsg.com/index/cdk')
+    options = webdriver.ChromeOptions()
+    # 设置加载策略为eager
+    options.page_load_strategy = 'eager'
+    driver = webdriver.Chrome(options=options)
+    driver.get('https://jsbt.uemdw.com/index/cdk')
+    time.sleep(1)
     server_element = driver.find_element(By.ID, 'server')
     # 创建 Select 对象
     select = Select(server_element)
@@ -54,7 +58,8 @@ def my_cdk(server, my_account):
     roles = Select(roles_element)
     roles.select_by_index(1)
     cdk = driver.find_element(By.ID, 'cdk')
-    cdk.send_keys('js2024666')
+    cdk.send_keys('js2024777')
+    # cdk.send_keys('jsbt1212')
     imgCode = driver.find_element(By.ID, 'verifyCode')
     the_captcha = verify(imgCode)
     captcha = driver.find_element(By.ID, 'captcha')
