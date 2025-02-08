@@ -19,7 +19,19 @@ def crc(data1, data2):
     # zfill向左填充0,ljust向右填充0
     # 冗余码需要填充到长度为多项式阶数，没有则往左补0
     s = s[s.find('1'):].zfill(length - 1)
-    print(original + s)
+    print('最终发送的信息码是：' + original + s)
 
 
-crc('1101', '1111')
+while True:
+    user_input = input("请输入多项式除数和原信息码并用逗号分隔\n")
+    if user_input.lower() == 'exit':
+        print("程序结束。")
+        break
+    try:
+        data1, data2 = user_input.split(',')
+        data1 = data1.strip()  # 去除多余空格
+        data2 = data2.strip()  # 去除多余空格
+        crc(data1, data2)
+    except ValueError as e:
+        print("输入有误请重新输入")
+        continue
