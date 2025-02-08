@@ -1,9 +1,7 @@
 def crc(data1, data2):
     original = data2
     # data1是根据多项式获得的除数，data2是元数据
-    for i in range(len(data1) - 1):
-        data2 = data2 + '0'
-    # print(data2)
+    # data2 = data2 + '0' * (len(data1) - 1)
     index = data2.find('1')
     # 被除数
     s = data2[index:]
@@ -19,7 +17,7 @@ def crc(data1, data2):
     # zfill向左填充0,ljust向右填充0
     # 冗余码需要填充到长度为多项式阶数，没有则往左补0
     s = s[s.find('1'):].zfill(length - 1)
-    print('最终发送的信息码是：' + original + s)
+    print('余数为:' + s + ' 最终发送的信息码是：' + original + s)
 
 
 while True:
