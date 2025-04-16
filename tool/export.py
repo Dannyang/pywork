@@ -131,7 +131,28 @@ def extract_course_ids(html):
     return courses
 
 
-def write_attendance(activity_id, class_id, course_id, excel_path, count):
+def get_attendance_name(activity_id):
+    url = 'https://mobilelearn.chaoxing.com/v2/apis/active/getPPTActiveInfo'
+    param = {
+        'activeId': activity_id
+    }
+    # 构建完整URL
+    url = f"{url}?{urlencode(param)}"
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        if data.get('result') == 1:
+            return data.get('data', {}).get('name', '')
+    except requests.exceptions.RequestException as e:
+        print(f"请求发生错误: {e}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"JSON解析错误: {e}")
+        return None
+
+
+def get_attendance_list(activity_id, class_id, course_id):
     url = 'https://mobilelearn.chaoxing.com/widget/sign/pcTeaSignController/getAttendList'
     param = {
         'fid': fid,
@@ -143,40 +164,52 @@ def write_attendance(activity_id, class_id, course_id, excel_path, count):
     url = f"{url}?{urlencode(param)}"
     try:
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # 检查HTTP错误
-        # 读取Excel文件
-        df = pd.read_excel(excel_path, engine="openpyxl")
-        # 解析JSON响应
+        response.raise_for_status()
         data = response.json()
-        col_name = f'考勤_1'
         if data.get('result') == 1:
             # 创建临时字典存储本次考勤数据
             attendance_dict = {}
-            for item in data['data']:
-                # 处理已签到列表
-                for student in data['data']['yiqianList']:
-                    name = student['name']
-                    attendance_dict[name] = student['status']
-
-                # 处理未签到列表
-                for student in data['data']['weiqianList']:
-                    name = student['name']
-                    attendance_dict[name] = student['status']
-                    # 添加新列到DataFrame
-            df[col_name] = df['姓名'].map(attendance_dict)
-
-            df.to_excel(excel_path, index=False)
-            print("done")
-        else:
-            print(f"API请求失败: {data.get('msg', '未知错误')}")
-            return None
-
+            # 处理已签到列表
+            for student in data['data']['yiqianList']:
+                name = student['name']
+                attendance_dict[name] = student['status']
+            # 处理未签到列表
+            for student in data['data']['weiqianList']:
+                name = student['name']
+                attendance_dict[name] = student['status']
+            return attendance_dict
     except requests.exceptions.RequestException as e:
         print(f"请求发生错误: {e}")
         return None
     except json.JSONDecodeError as e:
         print(f"JSON解析错误: {e}")
         return None
+
+
+def write_attendance(activity_items, class_id, course_id, excel_path):
+    count = 0
+    for a in activity_items:
+        if a.get('activeType') != 2:
+            continue
+        attendance_dict = get_attendance_list(activity_id=a['activeId'], class_id=class_id, course_id=course_id)
+        if attendance_dict and len(attendance_dict) > 0:
+            try:
+                # 读取Excel文件
+                df = pd.read_excel(excel_path, engine="openpyxl")
+                col_name = a.get('title')
+                # 添加新列到DataFrame
+                # 将字典的键转换为 DataFrame
+                if count == 0:
+                    new_data = pd.DataFrame(list(attendance_dict.keys()), columns=['姓名'])
+                    # 追加到原数据
+                    df = pd.concat([df, new_data], ignore_index=True)
+                    count = count + 1
+                df[col_name] = df['姓名'].map(attendance_dict)
+                df.to_excel(excel_path, index=False)
+                print("done")
+            except requests.exceptions.RequestException as e:
+                print(f"请求发生错误: {e}")
+                return None
 
 
 courses = extract_course_ids(request_course_html())
@@ -188,12 +221,8 @@ for course_item in courses:
         # 创建execl文件
         df = pd.DataFrame(columns=["姓名"])
         df.to_excel(excel_path, index=False, engine="openpyxl")
-        activity_ids = activity_course_class(course_id=course_item.course_id, class_id=class_item['id'])
-        count = 0
-        for activity_id_item in activity_ids:
-            write_attendance(activity_id=activity_id_item['activeId'], class_id=class_item['id'],
-                             course_id=course_item.course_id, excel_path=excel_path, count= count)
-            count = count + 1
-
+        activity_items = activity_course_class(course_id=course_item.course_id, class_id=class_item['id'])
+        write_attendance(activity_items=activity_items, class_id=class_item['id'],
+                         course_id=course_item.course_id, excel_path=excel_path)
 
 # write_attendance(activity_id='6000121485923', class_id='114709224', course_id='249940325')
