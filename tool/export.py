@@ -13,6 +13,8 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
 }
 
+status_dict = {'1': '已签到', '8': '事假', '9': '迟到', '0': '未签到', '7': '病假', '2': '教师代签', '12': '公假', '5': '缺勤'}
+
 
 class Course:
     def __init__(self, course_id: str, course_name: str):
@@ -172,11 +174,13 @@ def get_attendance_list(activity_id, class_id, course_id):
             # 处理已签到列表
             for student in data['data']['yiqianList']:
                 name = student['name']
-                attendance_dict[name] = student['status']
+                status_key = str(student['status'])
+                attendance_dict[name] = status_dict[status_key]
             # 处理未签到列表
             for student in data['data']['weiqianList']:
                 name = student['name']
-                attendance_dict[name] = student['status']
+                status_key = str(student['status'])
+                attendance_dict[name] = status_dict[status_key]
             return attendance_dict
     except requests.exceptions.RequestException as e:
         print(f"请求发生错误: {e}")
