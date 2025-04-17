@@ -6,14 +6,24 @@ from urllib.parse import urlencode
 from pathlib import Path
 import pandas as pd
 
-fid = '11109'
 cookie = 'fid=11109; _uid=381235795; UID=381235795; xxtenc=4065a26bded7e381fe84dc6e3189ef57; source=""; thirdRegist=0; route=c010ccedb771f8b7c7793c67ee1d2aae; k8s=1744721000.468.17568.35332; spaceFid=11109; spaceRoleId=1; tl=1; orgfid=43843; registerCode=00010048000100010018; _d=1744723232719; vc3=RMkV1rM3qHFy9BP9tR7UI%2BmNjIpAFmk%2F4mCiJa2UqJQD5%2B8lcP4td%2FcjtV3DliovUmGdHkaPDyMvVHvIqovzQHNuK%2FE4QLGOlYLd%2BX%2Bj5eMXqHZ8PVyXVGqxx%2FlR5GVWL%2BPoVnnnXKibSeoZ42H%2FASInQEf3%2FtPTXtda6BSY5Bw%3D8755c545e6956455610c5af79f7d8029; uf=b2d2c93beefa90dc042df553c84db8fe3e00529daf8b4fd9ed898f55330f78561aa8965e419378ec660451fb5626896bd110c105546a283d26ce4e094e3f8fdfffcc3e0ecaa21d4f9e851954d33ea9726d0f06b5c9eac81ca5f2f33c8c1f840245bc2cc8f3dac912dfd4860a93fcbeea883843d4ba9fc84fe7c43f1a2f38e044577a9aa095a87b2c; cx_p_token=3b5f2b38e78b1cc31dad0f30af2f953b; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIzODEyMzU3OTUiLCJsb2dpblRpbWUiOjE3NDQ3MjMyMzI3MjAsImV4cCI6MTc0NTMyODAzMn0.nZjxFrJu_pi_rbU6mj6h316O97I9MNJRobiqPyYqhWA; DSSTASH_LOG=C_38-UN_10575-US_381235795-T_1744723232721; jrose=0790D64ED471CFAED12DE22FA6E55F5A.mooc2-2988524682-l6pwk'
 headers = {
     'Cookie': cookie,
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
 }
+# 按分号和空格分割字符串，得到键值对列表
+cookies = cookie.split('; ')
+# 遍历键值对，找到fid的值
+fid = None
+for cookie in cookies:
+    if cookie.startswith('fid='):
+        fid = cookie.split('=', 1)[1]  # 分割一次，避免值中有等号
+        break
 
-status_dict = {'1': '已签到', '8': '事假', '9': '迟到', '0': '未签到', '7': '病假', '2': '教师代签', '12': '公假', '5': '缺勤'}
+status_dict = {'1': '已签到', '8': '事假', '9': '迟到', '0': '未签到', '7': '病假', '2': '教师代签', '12': '公假',
+               '5': '缺勤'}
+course_list = ['']
+class_list = ['']
 
 
 class Course:
@@ -218,9 +228,13 @@ def write_attendance(activity_items, class_id, course_id, excel_path):
 
 courses = extract_course_ids(request_course_html())
 for course_item in courses:
+    if course_item.course_name not in course_list:
+        continue
     class_json = class_by_course(course_item)
     script_path = Path(__file__).resolve()
     for class_item in class_json:
+        if class_item['name'] not in course_list:
+            continue
         excel_path = script_path.parent / course_item.course_name / f"{class_item['name']}.xlsx"
         # 创建execl文件
         df = pd.DataFrame(columns=["姓名"])
