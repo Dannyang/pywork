@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from pathlib import Path
 import pandas as pd
 
-cookie = 'fid=11109; _uid=381235795; UID=381235795; xxtenc=4065a26bded7e381fe84dc6e3189ef57; source=""; thirdRegist=0; route=c010ccedb771f8b7c7793c67ee1d2aae; k8s=1744721000.468.17568.35332; spaceFid=11109; spaceRoleId=1; tl=1; orgfid=43843; registerCode=00010048000100010018; _d=1744723232719; vc3=RMkV1rM3qHFy9BP9tR7UI%2BmNjIpAFmk%2F4mCiJa2UqJQD5%2B8lcP4td%2FcjtV3DliovUmGdHkaPDyMvVHvIqovzQHNuK%2FE4QLGOlYLd%2BX%2Bj5eMXqHZ8PVyXVGqxx%2FlR5GVWL%2BPoVnnnXKibSeoZ42H%2FASInQEf3%2FtPTXtda6BSY5Bw%3D8755c545e6956455610c5af79f7d8029; uf=b2d2c93beefa90dc042df553c84db8fe3e00529daf8b4fd9ed898f55330f78561aa8965e419378ec660451fb5626896bd110c105546a283d26ce4e094e3f8fdfffcc3e0ecaa21d4f9e851954d33ea9726d0f06b5c9eac81ca5f2f33c8c1f840245bc2cc8f3dac912dfd4860a93fcbeea883843d4ba9fc84fe7c43f1a2f38e044577a9aa095a87b2c; cx_p_token=3b5f2b38e78b1cc31dad0f30af2f953b; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIzODEyMzU3OTUiLCJsb2dpblRpbWUiOjE3NDQ3MjMyMzI3MjAsImV4cCI6MTc0NTMyODAzMn0.nZjxFrJu_pi_rbU6mj6h316O97I9MNJRobiqPyYqhWA; DSSTASH_LOG=C_38-UN_10575-US_381235795-T_1744723232721; jrose=0790D64ED471CFAED12DE22FA6E55F5A.mooc2-2988524682-l6pwk'
+cookie = 'fid=167983; _uid=159598606; _d=1744866937210; UID=159598606; vc3=EXYt6xjUl0hcVtHTyYW4kPMHytqvyeFV0Q8N3M%2FO7sfXBP8BN3lh%2Fz4jTGaAuu9J8X19IEn26FRi%2BFMcFwRD43yaPBElBaAeZP%2F17OixwAF3VqR1xdftO81zl5pdPm1KX2KKDd7JMPDFVVCa0o4DDA2Joar28p9YaoAcnLOFhYM%3D91641d6fb8700f2f0711b98885793d8e; uf=b2d2c93beefa90dc0e58f5e20478320846deb320366635b8ccd272461f400c99500856e34427f8f6cfec2656b3752fc66e05ed12397b5ca065057927e8f99f961a9cfffaba7b49c29c456714c93a27acb11b62c52d1197adc4a35a8edc5ea02f37df08321706ec2470184964ffe8c27c66e2c6168d73cb305a01432e9a5fb18db1f899d50c1c3fa3aa2ebad65cd196bb; cx_p_token=09b77a35ff6b3d9b04f8e2c0932354c1; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxNTk1OTg2MDYiLCJsb2dpblRpbWUiOjE3NDQ4NjY5MzcyMTIsImV4cCI6MTc0NTQ3MTczN30.V7PXCUXSRqU7pONvujepaLSqJCF3rMw_qG8f2PuHLIs; xxtenc=fba95c7cadc0ec909232a3f602a34229; DSSTASH_LOG=C_38-UN_10575-US_159598606-T_1744866937212; source=""; thirdRegist=0; tl=1; route=44030bc8a3c0af15b8ff79c9243587ed; JSESSIONID=1933E80242F17D78D0D3FF06F3E7A776; route_mobilelearn=55d5bc3aa72a09ebb5e840d12718eff4; route_widget=fa72976f7522b88e057f37f2542fb7e4'
 headers = {
     'Cookie': cookie,
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
@@ -21,9 +21,10 @@ for cookie in cookies:
         break
 
 status_dict = {'1': '已签到', '8': '事假', '9': '迟到', '0': '未签到', '7': '病假', '2': '教师代签', '12': '公假',
-               '5': '缺勤'}
-course_list = ['']
-class_list = ['']
+               '5': '缺勤', '10': '早退'}
+course_list = ['跨境平台运营与管理置顶']
+class_list = ['23跨境电商1班', '23跨境电商2班', '23商英2班', '23商英1班']
+time_limit = 1739548800551
 
 
 class Course:
@@ -135,11 +136,6 @@ def extract_course_ids(html):
 
         # 创建实体并添加到集合
         courses.add(Course(course_id=course_id, course_name=course_name))
-    for course in courses:
-        script_path = Path(__file__).resolve()
-        course_folder = script_path.parent / course.course_name
-        # 创建文件夹
-        course_folder.mkdir(exist_ok=True)
     return courses
 
 
@@ -185,12 +181,12 @@ def get_attendance_list(activity_id, class_id, course_id):
             for student in data['data']['yiqianList']:
                 name = student['name']
                 status_key = str(student['status'])
-                attendance_dict[name] = status_dict[status_key]
+                attendance_dict[name] = status_dict.get(status_key, status_key)
             # 处理未签到列表
             for student in data['data']['weiqianList']:
                 name = student['name']
                 status_key = str(student['status'])
-                attendance_dict[name] = status_dict[status_key]
+                attendance_dict[name] = status_dict.get(status_key, status_key)
             return attendance_dict
     except requests.exceptions.RequestException as e:
         print(f"请求发生错误: {e}")
@@ -203,7 +199,7 @@ def get_attendance_list(activity_id, class_id, course_id):
 def write_attendance(activity_items, class_id, course_id, excel_path):
     count = 0
     for a in activity_items:
-        if a.get('activeType') != 2:
+        if a.get('activeType') != 2 or a.get('createtime') <= time_limit:
             continue
         attendance_dict = get_attendance_list(activity_id=a['activeId'], class_id=class_id, course_id=course_id)
         if attendance_dict and len(attendance_dict) > 0:
@@ -230,10 +226,14 @@ courses = extract_course_ids(request_course_html())
 for course_item in courses:
     if course_item.course_name not in course_list:
         continue
+    script_path = Path(__file__).resolve()
+    course_folder = script_path.parent / course_item.course_name
+    # 创建文件夹
+    course_folder.mkdir(exist_ok=True)
     class_json = class_by_course(course_item)
     script_path = Path(__file__).resolve()
     for class_item in class_json:
-        if class_item['name'] not in course_list:
+        if class_item['name'] not in class_list:
             continue
         excel_path = script_path.parent / course_item.course_name / f"{class_item['name']}.xlsx"
         # 创建execl文件
