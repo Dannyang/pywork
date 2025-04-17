@@ -231,7 +231,6 @@ for course_item in courses:
     # 创建文件夹
     course_folder.mkdir(exist_ok=True)
     class_json = class_by_course(course_item)
-    script_path = Path(__file__).resolve()
     for class_item in class_json:
         if class_item['name'] not in class_list:
             continue
