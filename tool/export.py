@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from pathlib import Path
 import pandas as pd
 
-cookie = 'fid=167983; _uid=159598606; _d=1744866937210; UID=159598606; vc3=EXYt6xjUl0hcVtHTyYW4kPMHytqvyeFV0Q8N3M%2FO7sfXBP8BN3lh%2Fz4jTGaAuu9J8X19IEn26FRi%2BFMcFwRD43yaPBElBaAeZP%2F17OixwAF3VqR1xdftO81zl5pdPm1KX2KKDd7JMPDFVVCa0o4DDA2Joar28p9YaoAcnLOFhYM%3D91641d6fb8700f2f0711b98885793d8e; uf=b2d2c93beefa90dc0e58f5e20478320846deb320366635b8ccd272461f400c99500856e34427f8f6cfec2656b3752fc66e05ed12397b5ca065057927e8f99f961a9cfffaba7b49c29c456714c93a27acb11b62c52d1197adc4a35a8edc5ea02f37df08321706ec2470184964ffe8c27c66e2c6168d73cb305a01432e9a5fb18db1f899d50c1c3fa3aa2ebad65cd196bb; cx_p_token=09b77a35ff6b3d9b04f8e2c0932354c1; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxNTk1OTg2MDYiLCJsb2dpblRpbWUiOjE3NDQ4NjY5MzcyMTIsImV4cCI6MTc0NTQ3MTczN30.V7PXCUXSRqU7pONvujepaLSqJCF3rMw_qG8f2PuHLIs; xxtenc=fba95c7cadc0ec909232a3f602a34229; DSSTASH_LOG=C_38-UN_10575-US_159598606-T_1744866937212; source=""; thirdRegist=0; tl=1; route=44030bc8a3c0af15b8ff79c9243587ed; JSESSIONID=1933E80242F17D78D0D3FF06F3E7A776; route_mobilelearn=55d5bc3aa72a09ebb5e840d12718eff4; route_widget=fa72976f7522b88e057f37f2542fb7e4'
+cookie = 'jrose=830B963768AA9899649B0A43A997D4A2.ans; siteRole=1; roleEnc=FFC61D695BED4B549473FF78515C10AB; source=""; fid=167983; _uid=159598606; _d=1750335363653; UID=159598606; vc3=LXWMc%2FDEh4Y9XK1p%2B1Zo%2F50wUi9BINSJVN2HdxtHtVLB0kCBx9%2BkkNm8ksA77IV7cGJFo4P5644Cw4wk22%2BoLBtePxhEcovlZ2%2BFLxtHmn3SvoXmiMpjiyyCIKwukErmZjEBDla1ZyffqV8AXBJpriY6HU40o2iDH%2FszPIJVkTc%3D2281e0930cbacd7d41dc816cf72dfff9; uf=b2d2c93beefa90dc0e58f5e20478320846deb320366635b8ccd272461f400c99b5bfe39a28794b8dda5173624c47417a8e33962514b70d6eea4a1670a3a8352f7631dba781cdd959f44425e20f927c6b514e370902fb1934fd8d1b9f89f0c1c6a2caeba8547d183ac29d66c7f7238a5b5cb49c9381c6a6cc04df951ef14fa2fbaa24ec2b1e16004711d78d04c58940be2723ac693a7cdca9fd68be96b6183b1ad8eccfb0b782d78cbc73ff002cb6e046f236767cbd7986eaf3d718d572fcfc7c; cx_p_token=c122ebf3d39424484cd5590740b8895d; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxNTk1OTg2MDYiLCJsb2dpblRpbWUiOjE3NTAzMzUzNjM2NTQsImV4cCI6MTc1MDk0MDE2M30.kn6WUjSZ8ilyfJRfzSNI3Gp6GfhJDK2Mm5k2SUTjsWo; xxtenc=fba95c7cadc0ec909232a3f602a34229; DSSTASH_LOG=C_38-UN_10575-US_159598606-T_1750335363654; spaceFidEnc=21290A09FD51F85261CB74C4F716856B; spaceFid=167983; spaceRoleId=""; tl=1'
 headers = {
     'Cookie': cookie,
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
@@ -24,6 +24,8 @@ status_dict = {'1': '已签到', '8': '事假', '9': '迟到', '0': '未签到',
                '5': '缺勤', '10': '早退'}
 course_list = ['跨境平台运营与管理置顶']
 class_list = ['23跨境电商1班', '23跨境电商2班', '23商英2班', '23商英1班']
+# course_list = ['数据库应用基础']
+# class_list = ['24工业互联3班', '24工业互联2班', '24工业互联1班']
 time_limit = 1739548800551
 
 
@@ -100,7 +102,9 @@ def activity_course_class(course_id, class_id):
         data = response.json()
 
         if data.get('result') == 1:
-            return data.get('data', {}).get('activeList', [])
+            active_list = data.get('data', {}).get('activeList', [])
+            active_list.sort(key=lambda x: int(x['createtime']))
+            return active_list
         else:
             print(f"API请求失败: {data.get('msg', '未知错误')}")
             return None
